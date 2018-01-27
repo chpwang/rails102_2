@@ -12,7 +12,7 @@
         <tr>
           <td>#</td>
           <td><%= link_to(group.title, group_path(group)) %></td>
-          <td><%= group.description %></td>
+          <td><%= render_group_description(group) %></td>
           <td>
               <%= link_to("Edit", edit_account_group_path(group), class: "btn btn-sm btn-default")%>
               <%= link_to("Delete", account_group_path(group),    class: "btn btn-sm btn-default", 
