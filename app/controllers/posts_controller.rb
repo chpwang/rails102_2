@@ -1,16 +1,15 @@
 class PostsController < ApplicationController
   before_action :authenticate_user!
+  before_action :find_group_and_check_user_paticipated_group, only: [:new, :create]
   before_action :find_post_and_check_permission, only: [:edit, :update, :destroy]
 
   def new
-    @group = Group.find(params[:group_id])
     @post = Post.new
   end
 
   def create
     @post = Post.new(post_params)
     @post.user = current_user
-    @group = Group.find(params[:group_id])
     @post.group = @group
 
     if @post.save
@@ -43,6 +42,14 @@ class PostsController < ApplicationController
 
   def post_params
     params.require(:post).permit(:content)
+  end
+
+  def find_group_and_check_user_paticipated_group
+    @group = Group.find(params[:group_id])
+
+    if !current_user.is_member_of?(@group)
+      redirect_to group_path(@group), alert: "You haven't participated in this group"
+    end
   end
 
   def find_post_and_check_permission
