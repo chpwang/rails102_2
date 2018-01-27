@@ -1,29 +1,29 @@
 class PostsController < ApplicationController
   before_action :authenticate_user!
+  before_action :find_post_and_check_permission, only: [:edit, :update, :destroy]
 
   def new
+    @group = Group.find(params[:group_id])
     @post = Post.new
   end
 
   def create
     @post = Post.new(post_params)
     @post.user = current_user
-    @group = Group.find(params[:id])
+    @group = Group.find(params[:group_id])
     @post.group = @group
 
     if @post.save
-      redirect_to groups_path(@group), notice: "Post Successfully Created"
+      redirect_to group_path(@group), notice: "Post Successfully Created"
     else
       render :new
     end
   end
 
   def edit
-    @post = Post.find(params[:id])
   end
 
   def update
-    @post = Post.find(params[:id])
 
     if @post.update(post_params)
       redirect_to group_path(@group), notice: "Post Successfully Updated"
@@ -33,8 +33,6 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    @post = Post.find(params[:id])
-    @group = @post.group
 
     @post.destroy
 
@@ -45,6 +43,15 @@ class PostsController < ApplicationController
 
   def post_params
     params.require(:post).permit(:content)
+  end
+
+  def find_post_and_check_permission
+    @group = Group.find(params[:group_id])
+    @post = Post.find(params[:id])
+
+    if @post.user != current_user
+      redirect_to group_path(@group), alert: "You have no permission"
+    end
   end
 
 end

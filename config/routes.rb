@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   root "groups#index"
 
   resources :groups do
-    resources :post
+    resources :posts
   end
 
 end
